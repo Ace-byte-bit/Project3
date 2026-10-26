@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🔖 Bookmark Manager</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 780px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #11998e;
+            margin-bottom: 25px;
+        }
+
+        /* ===== ADD FORM ===== */
+        .add-form {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr auto;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .add-form input,
+        .add-form select {
+            padding: 12px;
+            font-size: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .add-form input:focus,
+        .add-form select:focus {
+            outline: none;
+            border-color: #11998e;
+        }
+        #addBtn {
+            padding: 12px 20px;
+            background: #11998e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        #addBtn:hover {
+            background: #0e8074;
+        }
+
+        /* Mobile — stack the form */
+        @media (max-width: 600px) {
+            .add-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== TOOLBAR ===== */
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        #searchInput {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 14px;
+            font-size: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        #searchInput:focus {
+            outline: none;
+            border-color: #11998e;
+        }
+        .filter-btns {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 8px 14px;
+            background: #f0f0f0;
+            color: #555;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover {
+            background: #e0e0e0;
+        }
+        .filter-btn.active {
+            background: #11998e;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* ===== STATS ===== */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 12px;
+            background: #f7f7f7;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .stat-value {
+            font-weight: bold;
+            color: #11998e;
+            font-size: 18px;
+        }
+
+        /* ===== BOOKMARK LIST ===== */
+        #bookmarkList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #bookmarkList li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+            border-left: 4px solid #11998e;
+        }
+        #bookmarkList li:hover {
+            background: #f0f9f7;
+            transform: translateX(3px);
+        }
+        .favicon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            background: #e0e0e0;
+        }
+        .bm-info {
+            flex: 1;
+            min-width: 0;
+            cursor: pointer;
+        }
+        .bm-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 3px;
+            word-wrap: break-word;
+        }
+        .bm-url {
+            font-size: 12px;
+            color: #888;
+            margin: 0 0 3px;
+            word-wrap: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .bm-category {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: #11998e;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+        .bm-category.work { background: #2196F3; }
+        .bm-category.fun { background: #e91e63; }
+        .bm-category.learning { background: #9c27b0; }
+        .bm-category.other { background: #607d8b; }
+
+        .bm-actions {
+            display: flex;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+        .copy-btn,
+        .delete-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .copy-btn {
+            background: #2196F3;
+            color: white;
+        }
+        .copy-btn:hover { background: #1976D2; }
+        .delete-btn {
+            background: #f44336;
+            color: white;
+        }
+        .delete-btn:hover { background: #d32f2f; }
+
+        /* ===== EMPTY STATE ===== */
+        #emptyState {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+        #emptyState.hidden {
+            display: none;
+        }
+        #emptyState .emoji {
+            font-size: 48px;
+            margin: 0;
+        }
+        #emptyState .title {
+            font-size: 16px;
+            color: #666;
+            margin: 10px 0 0;
+            font-weight: 500;
+        }
+        #emptyState .subtitle {
+            font-size: 14px;
+            margin: 5px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔖 Bookmark Manager</h1>
+
+        <!-- ===== ADD FORM ===== -->
+        <div class="add-form">
+            <input type="text" id="titleInput" placeholder="Title (e.g., YouTube)">
+            <input type="text" id="urlInput" placeholder="URL (e.g., youtube.com)">
+            <select id="categorySelect">
+                <option value="other">Other</option>
+                <option value="work">Work</option>
+                <option value="fun">Fun</option>
+                <option value="learning">Learning</option>
+            </select>
+            <button id="addBtn">Add</button>
+        </div>
+
+        <!-- ===== TOOLBAR ===== -->
+        <div class="toolbar">
+            <input type="text" id="searchInput" placeholder="🔍 Search bookmarks...">
+            <div class="filter-btns">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="work">Work</button>
+                <button class="filter-btn" data-filter="fun">Fun</button>
+                <button class="filter-btn" data-filter="learning">Learning</button>
+                <button class="filter-btn" data-filter="other">Other</button>
+            </div>
+        </div>
+
+        <!-- ===== STATS ===== -->
+        <div class="stats">
+            <div>Total: <span class="stat-value" id="totalCount">0</span></div>
+            <div>Showing: <span class="stat-value" id="showingCount">0</span></div>
+            <div>Categories: <span class="stat-value" id="categoryCount">0</span></div>
+        </div>
+
+        <!-- ===== LIST ===== -->
+        <ul id="bookmarkList"></ul>
+
+        <!-- ===== EMPTY STATE ===== -->
+        <div id="emptyState">
+            <p class="emoji">🔖</p>
+            <p class="title">No bookmarks yet</p>
+            <p class="subtitle">Add your first bookmark above!</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
